@@ -1,9 +1,11 @@
-package com.nganhthien.mikemovie;
+package com.nganhthien.mikemovie.screen.main;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.nganhthien.mikemovie.R;
+import com.nganhthien.mikemovie.screen.BaseActivity;
+
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
