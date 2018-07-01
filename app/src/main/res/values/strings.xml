@@ -8,4 +8,5 @@
     <string name="home">Home</string>
     <string name="favorite">Favorite</string>
     <string name="more">More</string>
+    <string name="load_genres_failed">Load genres failed.</string>
 </resources>
