@@ -5,13 +5,14 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/text_head_popular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_8"
         android:layout_marginTop="@dimen/dp_8"
         android:text="@string/most_popular"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/color_text_title"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,16 +21,16 @@
         android:id="@+id/image_view_popular"
         android:layout_width="0dp"
         android:layout_height="@dimen/dp_160"
+        android:layout_marginEnd="@dimen/dp_8"
         android:layout_marginStart="@dimen/dp_8"
         android:layout_marginTop="@dimen/dp_12"
-        android:layout_marginEnd="@dimen/dp_8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/text_head_popular"
         app:srcCompat="@drawable/ab_movie" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/view_layer_transparent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/color_black_transparent"
@@ -57,10 +58,14 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/dp_8"
         android:layout_marginStart="@dimen/dp_8"
-        android:layout_marginTop="@dimen/dp_8"
+        android:layout_marginTop="@dimen/dp_16"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:shadowColor="@android:color/black"
         android:text="@string/sample_text"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@android:color/white"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/image_view_popular"
         app:layout_constraintStart_toEndOf="@+id/image_view_popular_small"
         app:layout_constraintTop_toTopOf="@+id/image_view_popular_small" />
@@ -72,6 +77,8 @@
         android:layout_marginEnd="@dimen/dp_8"
         android:layout_marginStart="@dimen/dp_8"
         android:layout_marginTop="@dimen/dp_8"
+        android:ellipsize="end"
+        android:maxLines="2"
         android:text="@string/sample_text"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/image_view_popular_small"
@@ -88,7 +95,7 @@
         app:layout_constraintEnd_toStartOf="@+id/image_view_popular_sub_2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/view_layer_transparent"
         app:srcCompat="@mipmap/ic_launcher_round" />
 
     <ImageView
@@ -100,7 +107,7 @@
         app:layout_constraintEnd_toStartOf="@+id/image_view_popular_sub_3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/image_view_popular_sub_1"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/view_layer_transparent"
         app:srcCompat="@mipmap/ic_launcher_foreground" />
 
     <ImageView
@@ -113,7 +120,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/image_view_popular_sub_2"
-        app:layout_constraintTop_toBottomOf="@+id/view"
+        app:layout_constraintTop_toBottomOf="@+id/view_layer_transparent"
         app:srcCompat="@mipmap/ic_launcher_foreground" />
 
     <TextView
@@ -121,7 +128,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_8"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/sample_text"
+        android:textColor="@color/color_text_sub_title"
         app:layout_constraintEnd_toEndOf="@+id/image_view_popular_sub_1"
         app:layout_constraintStart_toStartOf="@+id/image_view_popular_sub_1"
         app:layout_constraintTop_toBottomOf="@+id/image_view_popular_sub_1" />
@@ -131,7 +141,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_8"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/sample_text"
+        android:textColor="@color/color_text_sub_title"
         app:layout_constraintEnd_toEndOf="@+id/image_view_popular_sub_2"
         app:layout_constraintStart_toStartOf="@+id/image_view_popular_sub_2"
         app:layout_constraintTop_toBottomOf="@+id/image_view_popular_sub_2" />
@@ -141,9 +154,26 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_8"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/sample_text"
+        android:textColor="@color/color_text_sub_title"
         app:layout_constraintEnd_toEndOf="@+id/image_view_popular_sub_3"
         app:layout_constraintStart_toStartOf="@+id/image_view_popular_sub_3"
         app:layout_constraintTop_toBottomOf="@+id/image_view_popular_sub_3" />
+
+    <TextView
+        android:id="@+id/text_popular_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dp_8"
+        android:layout_marginStart="@dimen/dp_8"
+        android:layout_marginTop="@dimen/dp_8"
+        android:maxLines="1"
+        android:text="@string/more"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_popular_sub_2" />
 
 </android.support.constraint.ConstraintLayout>

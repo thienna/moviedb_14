@@ -8,4 +8,7 @@ public final class Constants {
 
     private Constants() {
     }
+
+    // Home Screen Slider
+    public static final int HOME_SLIDER_TOTAL_PAGE = 5;
 }

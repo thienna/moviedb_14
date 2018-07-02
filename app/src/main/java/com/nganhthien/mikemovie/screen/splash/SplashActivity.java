@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 
 import com.nganhthien.mikemovie.screen.BaseActivity;
-import com.nganhthien.mikemovie.screen.home.HomeActivity;
+import com.nganhthien.mikemovie.screen.main.MainActivity;
 
 
 /**
@@ -26,7 +26,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
                 //Start Home Activity after Splash Screen
-                Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
 
                 finish();
