@@ -1,32 +1,58 @@
 package com.nganhthien.mikemovie.screen.main;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.screen.BaseActivity;
+import com.nganhthien.mikemovie.screen.home.HomeFragment;
 
 public class MainActivity extends BaseActivity implements MainContract.View {
 
-    private ViewPager mViewPager;
-    private TabLayout mTabLayout;
-    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        mViewPager = findViewById(R.id.viewpager_home);
-        mTabLayout = findViewById(R.id.tablayout_home);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation_bottom);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        MainViewPagerAdapter mainViewPagerAdapter = new MainViewPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mainViewPagerAdapter);
-        mTabLayout.setupWithViewPager(mViewPager);
+        setContentViewForFrameLayout(new HomeFragment());
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    setContentViewForFrameLayout(new HomeFragment());
+                    return true;
+                // Have not yet others frag
+                case R.id.navigation_favorite:
+                    setContentViewForFrameLayout(new HomeFragment());
+                    return true;
+                case R.id.navigation_more:
+                    setContentViewForFrameLayout(new HomeFragment());
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    private void setContentViewForFrameLayout(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frame_container, fragment)
+                .commit();
     }
 }

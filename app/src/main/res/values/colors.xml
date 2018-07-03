@@ -3,5 +3,7 @@
     <color name="colorPrimary">#FFD600</color>
     <color name="colorPrimaryDark">#FFAB00</color>
     <color name="colorAccent">#F4511E</color>
-    <color name="black_transparent">#6C020202</color>
+    <color name="color_black_transparent">#6C020202</color>
+    <color name="color_text_title">#47526E</color>
+    <color name="color_text_sub_title">#47525E</color>
 </resources>
