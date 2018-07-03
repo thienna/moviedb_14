@@ -13,6 +13,7 @@ public class HomeContract {
 
     interface View {
         void showLoadGenresSuccess(List<Genre> genres);
+
         void showLoadGenresFailed();
     }
 

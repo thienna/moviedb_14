@@ -37,41 +37,38 @@
             android:id="@+id/recycler_genres"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_64"
-            android:paddingBottom="@dimen/dp_16"
+            android:paddingBottom="@dimen/dp_2"
             android:paddingTop="@dimen/dp_16"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/slider_wrapper" />
 
-        <include
+        <FrameLayout
             android:id="@+id/list_top_genre_popular"
-            layout="@layout/list_top_genre_popular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recycler_genres" />
 
-        <include
+        <FrameLayout
             android:id="@+id/list_top_now_playing"
-            layout="@layout/list_top_now_playing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_top_genre_popular" />
 
-        <include
+        <FrameLayout
             android:id="@+id/list_top_upcoming"
-            layout="@layout/list_top_upcoming"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/list_top_now_playing" />
 
-        <include
-            layout="@layout/list_top_top_rate"
+        <FrameLayout
+            android:id="@+id/list_top_top_rate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dp_8"

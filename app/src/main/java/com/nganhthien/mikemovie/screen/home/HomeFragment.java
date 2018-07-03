@@ -3,8 +3,11 @@ package com.nganhthien.mikemovie.screen.home;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,11 +17,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.nganhthien.mikemovie.R;
+import com.nganhthien.mikemovie.data.model.Genre;
 import com.nganhthien.mikemovie.data.repository.GenreRepository;
 import com.nganhthien.mikemovie.utils.Constants;
-import com.nganhthien.mikemovie.data.model.Genre;
 
 import java.util.List;
+
+import static com.nganhthien.mikemovie.utils.Constants.SpecialMovieList.SPECIAL_MOVIE_LIST_MOST_POPULAR;
+import static com.nganhthien.mikemovie.utils.Constants.SpecialMovieList.SPECIAL_MOVIE_LIST_NOW_PLAYING;
+import static com.nganhthien.mikemovie.utils.Constants.SpecialMovieList.SPECIAL_MOVIE_LIST_TOP_RATE;
+import static com.nganhthien.mikemovie.utils.Constants.SpecialMovieList.SPECIAL_MOVIE_LIST_UPCOMING;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,6 +72,21 @@ public class HomeFragment extends Fragment
         genreRecyclerView.setAdapter(mHomeGenresRecyclerAdapter);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+        fragmentTransaction
+                .add(R.id.list_top_genre_popular, HomeMovieSpecialListFragment.newInstance(SPECIAL_MOVIE_LIST_MOST_POPULAR));
+        fragmentTransaction
+                .add(R.id.list_top_now_playing, HomeMovieSpecialListFragment.newInstance(SPECIAL_MOVIE_LIST_NOW_PLAYING));
+        fragmentTransaction
+                .add(R.id.list_top_top_rate, HomeMovieSpecialListFragment.newInstance(SPECIAL_MOVIE_LIST_TOP_RATE));
+        fragmentTransaction
+                .add(R.id.list_top_upcoming, HomeMovieSpecialListFragment.newInstance(SPECIAL_MOVIE_LIST_UPCOMING));
+        fragmentTransaction.commit();
     }
 
     @Override
