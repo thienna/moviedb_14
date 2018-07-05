@@ -7,4 +7,20 @@ import com.nganhthien.mikemovie.data.source.MovieDataSource;
  */
 
 public class MovieLocalDataSource implements MovieDataSource.LocalDataSource {
+
+    private static MovieLocalDataSource sInstance;
+
+    public static MovieLocalDataSource getInstance() {
+        if (sInstance == null) {
+            sInstance = new MovieLocalDataSource();
+        }
+        return sInstance;
+    }
+
+    private MovieLocalDataSource() {
+    }
+
+    public static void destroyInstance() {
+        sInstance = null;
+    }
 }
