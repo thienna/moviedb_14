@@ -23,6 +23,11 @@ public class MovieRepository
     @NonNull
     private MovieDataSource.RemoteDataSource mMovieRemoteDataSource;
 
+    @Override
+    public void loadMoviesRemote(String type, MovieDataSource.OnFetchDataListener listener) {
+        mMovieRemoteDataSource.loadMoviesRemote(type, listener);
+    }
+
     private MovieRepository(
             @NonNull MovieDataSource.LocalDataSource movieLocalDataSource,
             @NonNull MovieDataSource.RemoteDataSource movieRemoteDataSource) {
@@ -30,32 +35,17 @@ public class MovieRepository
         mMovieRemoteDataSource = checkNotNull(movieRemoteDataSource);
     }
 
-    /**
-     * Returns the single instance of this class, creating it if necessary.
-     *
-     * @param remoteDataSource the backend data source
-     * @param localDataSource  the device storage data source
-     * @return the {@link MovieRepository} instance
-     */
-    public static synchronized MovieRepository getInstance(
-            @NonNull MovieDataSource.LocalDataSource localDataSource,
-            @NonNull MovieDataSource.RemoteDataSource remoteDataSource) {
-
+    public static synchronized MovieRepository getInstance() {
         if (sInstance == null) {
-            sInstance = new MovieRepository(checkNotNull(localDataSource),
-                    checkNotNull(remoteDataSource));
+            sInstance = new MovieRepository(checkNotNull(MovieLocalDataSource.getInstance()),
+                    checkNotNull(MovieRemoteDataSource.getsInstance()));
         }
 
         return sInstance;
     }
 
-    /**
-     * Used to force
-     * {@link #getInstance(MovieDataSource.LocalDataSource, MovieDataSource.RemoteDataSource)}
-     * to create a new instance
-     * next time it's called.
-     */
     public static void destroyInstance() {
         sInstance = null;
+        MovieRemoteDataSource.destroyInstance();
     }
 }

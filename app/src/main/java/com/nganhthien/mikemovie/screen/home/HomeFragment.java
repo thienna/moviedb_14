@@ -77,16 +77,16 @@ public class HomeFragment extends Fragment
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction
                 .add(R.id.list_top_genre_popular,
-                        HomeMovieSpecialListFragment.newInstance(MovieType.MOST_POPULAR));
+                        HomeMoviesFragment.newInstance(MovieType.MOST_POPULAR));
         fragmentTransaction
                 .add(R.id.list_top_now_playing,
-                        HomeMovieSpecialListFragment.newInstance(MovieType.NOW_PLAYING));
+                        HomeMoviesFragment.newInstance(MovieType.NOW_PLAYING));
         fragmentTransaction
                 .add(R.id.list_top_top_rate,
-                        HomeMovieSpecialListFragment.newInstance(MovieType.TOP_RATED));
+                        HomeMoviesFragment.newInstance(MovieType.TOP_RATED));
         fragmentTransaction
                 .add(R.id.list_top_upcoming,
-                        HomeMovieSpecialListFragment.newInstance(MovieType.UPCOMING));
+                        HomeMoviesFragment.newInstance(MovieType.UPCOMING));
         fragmentTransaction.commit();
     }
 
