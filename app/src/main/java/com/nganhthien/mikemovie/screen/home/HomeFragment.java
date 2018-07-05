@@ -3,20 +3,34 @@ package com.nganhthien.mikemovie.screen.home;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.nganhthien.mikemovie.R;
+import com.nganhthien.mikemovie.data.model.Genre;
+import com.nganhthien.mikemovie.data.model.MovieType;
+import com.nganhthien.mikemovie.data.repository.GenreRepository;
 import com.nganhthien.mikemovie.utils.Constants;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment
+        implements HomeContract.View, HomeGenresRecyclerAdapter.OnRecyclerViewItemClickListener {
+
+    private HomeContract.Presenter mPresenter;
 
     // Setup for Slider
     private ViewPager mSliderPager;
@@ -28,6 +42,9 @@ public class HomeFragment extends Fragment {
     private final Handler mSliderHandler = new Handler();
     private Runnable mSliderInterval;
 
+    // Setup for Genre RecyclerView
+    private HomeGenresRecyclerAdapter mHomeGenresRecyclerAdapter;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -38,7 +55,39 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         initSlider(view);
+
+        mPresenter = new HomePresenter(GenreRepository.getInstance());
+        mPresenter.setView(this);
+        mPresenter.loadGenres();
+
+        RecyclerView genreRecyclerView = view.findViewById(R.id.recycler_genres);
+        genreRecyclerView
+                .setLayoutManager(new LinearLayoutManager(getActivity(),
+                        LinearLayoutManager.HORIZONTAL, false));
+
+        mHomeGenresRecyclerAdapter = new HomeGenresRecyclerAdapter(this);
+        genreRecyclerView.setAdapter(mHomeGenresRecyclerAdapter);
+
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+        fragmentTransaction
+                .add(R.id.list_top_genre_popular,
+                        HomeMovieSpecialListFragment.newInstance(MovieType.MOST_POPULAR));
+        fragmentTransaction
+                .add(R.id.list_top_now_playing,
+                        HomeMovieSpecialListFragment.newInstance(MovieType.NOW_PLAYING));
+        fragmentTransaction
+                .add(R.id.list_top_top_rate,
+                        HomeMovieSpecialListFragment.newInstance(MovieType.TOP_RATED));
+        fragmentTransaction
+                .add(R.id.list_top_upcoming,
+                        HomeMovieSpecialListFragment.newInstance(MovieType.UPCOMING));
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -51,6 +100,24 @@ public class HomeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         stopSliderInterval();
+    }
+
+    @Override
+    public void showLoadGenresSuccess(List<Genre> genres) {
+        mHomeGenresRecyclerAdapter.setData(genres);
+    }
+
+    @Override
+    public void showLoadGenresFailed(Exception e) {
+        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClickGenresRecyclerViewItem(Genre item) {
+        if (item == null) {
+            return;
+        }
+        Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
     }
 
     private void initSlider(View view) {
