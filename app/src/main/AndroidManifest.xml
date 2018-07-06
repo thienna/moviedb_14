@@ -26,6 +26,11 @@
             android:name=".screen.main.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/CustomAppTheme" />
+
+        <activity
+            android:name=".screen.detail.DetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomAppTheme" />
     </application>
 
 </manifest>

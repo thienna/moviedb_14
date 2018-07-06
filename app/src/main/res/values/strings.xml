@@ -9,4 +9,9 @@
     <string name="favorite">Favorite</string>
     <string name="more">More</string>
     <string name="load_genres_failed">Load genres failed.</string>
+    <string name="rating">Rating:</string>
+    <string name="release_date">Release date:</string>
+    <string name="overview">Overview</string>
+    <string name="casts">Casts</string>
+    <string name="production_companies">Production Companies</string>
 </resources>
