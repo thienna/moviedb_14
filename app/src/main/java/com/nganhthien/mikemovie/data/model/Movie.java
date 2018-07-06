@@ -1,10 +1,15 @@
 package com.nganhthien.mikemovie.data.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.nganhthien.mikemovie.utils.Constants;
+
 /**
  * Created by ThienNA on 29/06/2018.
  */
 
-public class Movie {
+public class Movie implements Parcelable {
     private int mId;
     private String mTitle;
     private String mOverview;
@@ -16,6 +21,44 @@ public class Movie {
     public Movie(int id, String title) {
         mId = id;
         mTitle = title;
+    }
+
+    protected Movie(Parcel in) {
+        mId = in.readInt();
+        mTitle = in.readString();
+        mOverview = in.readString();
+        mVoteAverage = in.readInt();
+        mPosterImage = in.readString();
+        mBackdropImage = in.readString();
+        mReleaseDate = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(mId);
+        parcel.writeString(mTitle);
+        parcel.writeString(mOverview);
+        parcel.writeInt(mVoteAverage);
+        parcel.writeString(mPosterImage);
+        parcel.writeString(mBackdropImage);
+        parcel.writeString(mReleaseDate);
     }
 
     public int getId() {
@@ -72,6 +115,18 @@ public class Movie {
 
     public void setReleaseDate(String releaseDate) {
         mReleaseDate = releaseDate;
+    }
+
+    public String createImageUrl(String type) {
+        StringBuilder url = new StringBuilder();
+        url.append(Constants.UrlConfig.PROTOCOL);
+        String typeAfterFormat;
+        if (type.equals(Constants.MovieApi.DOMAIN_BACKDROP_IMAGE)) {
+            typeAfterFormat = String.format(type, mBackdropImage);
+        } else {
+            typeAfterFormat = String.format(type, getPosterImage());
+        }
+        return url.append(typeAfterFormat).toString();
     }
 
     public static class JsonKey {

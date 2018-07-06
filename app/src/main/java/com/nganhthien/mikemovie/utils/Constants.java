@@ -35,6 +35,8 @@ public final class Constants {
         public static final String DOMAIN_BACKDROP_IMAGE = "image.tmdb.org/t/p/w500_and_h282_face/%s";
 
         public static final String GENRES_LIST_PATH = "genre/movie/list";
+        public static final String MOVIE_CREDITS = "movie/%s/credits";
+        public static final String MOVIE_DETAIL = "movie/";
 
         public static final String PARAM_KEY_LANGUAGE = "language=";
         public static final String PARAM_KEY_API_KEY = "api_key=";
@@ -44,4 +46,7 @@ public final class Constants {
         private MovieApi() {
         }
     }
+
+    public static final int DETAIL_SCREEN_OVEVERVIEW_MINLINE = 3;
+    public static final int DETAIL_SCREEN_OVEVERVIEW_MAXLINE = 9999;
 }

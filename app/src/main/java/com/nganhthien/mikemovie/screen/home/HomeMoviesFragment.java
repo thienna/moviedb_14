@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.repository.MovieRepository;
+import com.nganhthien.mikemovie.screen.detail.DetailActivity;
 import com.nganhthien.mikemovie.utils.Constants;
 
 import java.util.List;
@@ -27,9 +28,13 @@ import static com.nganhthien.mikemovie.data.model.MovieType.UPCOMING;
  * A simple {@link Fragment} subclass.
  */
 public class HomeMoviesFragment extends Fragment
-        implements HomeMoviesContract.View {
+        implements HomeMoviesContract.View, View.OnClickListener {
 
     private static final String ARGUMENT_PAGE = "ARGUMENT_PAGE";
+    private static final int MOVIE_MAIN_INDEX = 0;
+    private static final int MOVIE_SUB1_INDEX = 1;
+    private static final int MOVIE_SUB2_INDEX = 2;
+    private static final int MOVIE_SUB3_INDEX = 3;
     private HomeMoviesContract.Presenter mPresenter;
     private TextView mTextMoviesTypeHead;
     private TextView mTextMainItemTitle;
@@ -42,6 +47,11 @@ public class HomeMoviesFragment extends Fragment
     private ImageView mImageSubItem1Poster;
     private ImageView mImageSubItem2Poster;
     private ImageView mImageSubItem3Poster;
+    private View mViewWrapperMainItem;
+    private View mViewWrapperSubItem1;
+    private View mViewWrapperSubItem2;
+    private View mViewWrapperSubItem3;
+    private List<Movie> mMovies;
     private String mType;
 
     public static HomeMoviesFragment newInstance(String type) {
@@ -101,31 +111,37 @@ public class HomeMoviesFragment extends Fragment
         mImageSubItem1Poster = view.findViewById(R.id.image_view_sub_1_movie_special_list);
         mImageSubItem2Poster = view.findViewById(R.id.image_view_sub_2_movie_special_list);
         mImageSubItem3Poster = view.findViewById(R.id.image_view_sub_3_movie_special_list);
+
+        mViewWrapperMainItem = view.findViewById(R.id.view_main_item_wrapper);
+        mViewWrapperSubItem1 = view.findViewById(R.id.view_sub_item1_wrapper);
+        mViewWrapperSubItem2 = view.findViewById(R.id.view_sub_item2_wrapper);
+        mViewWrapperSubItem3 = view.findViewById(R.id.view_sub_item3_wrapper);
     }
 
     @Override
     public void showMoviesSuccess(List<Movie> movies) {
-        mTextMainItemTitle.setText(movies.get(0).getTitle());
-        mTextMainItemDescription.setText(movies.get(0).getOverview());
-        mTextSubItem1Title.setText(movies.get(1).getTitle());
-        mTextSubItem2Title.setText(movies.get(2).getTitle());
-        mTextSubItem3Title.setText(movies.get(3).getTitle());
+        mMovies = movies;
+        mTextMainItemTitle.setText(mMovies.get(MOVIE_MAIN_INDEX).getTitle());
+        mTextMainItemDescription.setText(movies.get(MOVIE_MAIN_INDEX).getOverview());
+        mTextSubItem1Title.setText(mMovies.get(MOVIE_SUB1_INDEX).getTitle());
+        mTextSubItem2Title.setText(mMovies.get(MOVIE_SUB2_INDEX).getTitle());
+        mTextSubItem3Title.setText(mMovies.get(MOVIE_SUB3_INDEX).getTitle());
 
-        Glide.with(getContext())
-                .load(makeImageUrl(movies, 0, Constants.MovieApi.DOMAIN_BACKDROP_IMAGE))
-                .into(mImageMainItemBackdrop);
-        Glide.with(getContext())
-                .load(makeImageUrl(movies, 0, Constants.MovieApi.DOMAIN_POSTER_IMAGE))
-                .into(mImageMainItemPoster);
-        Glide.with(getContext())
-                .load(makeImageUrl(movies, 1, Constants.MovieApi.DOMAIN_POSTER_IMAGE))
-                .into(mImageSubItem1Poster);
-        Glide.with(getContext())
-                .load(makeImageUrl(movies, 2, Constants.MovieApi.DOMAIN_POSTER_IMAGE))
-                .into(mImageSubItem2Poster);
-        Glide.with(getContext())
-                .load(makeImageUrl(movies, 3, Constants.MovieApi.DOMAIN_POSTER_IMAGE))
-                .into(mImageSubItem3Poster);
+        mViewWrapperMainItem.setOnClickListener(this);
+        mViewWrapperSubItem1.setOnClickListener(this);
+        mViewWrapperSubItem2.setOnClickListener(this);
+        mViewWrapperSubItem3.setOnClickListener(this);
+
+        glideForImage(MOVIE_MAIN_INDEX,
+                Constants.MovieApi.DOMAIN_BACKDROP_IMAGE, mImageMainItemBackdrop);
+        glideForImage(MOVIE_MAIN_INDEX,
+                Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageMainItemPoster);
+        glideForImage(MOVIE_SUB1_INDEX,
+                Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageSubItem1Poster);
+        glideForImage(MOVIE_SUB2_INDEX,
+                Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageSubItem2Poster);
+        glideForImage(MOVIE_SUB3_INDEX,
+                Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageSubItem3Poster);
     }
 
     @Override
@@ -133,15 +149,28 @@ public class HomeMoviesFragment extends Fragment
         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
     }
 
-    private String makeImageUrl(List<Movie> movies, int index, String type) {
-        StringBuilder imageUrl = new StringBuilder();
-        imageUrl.append(Constants.UrlConfig.PROTOCOL);
-        String typeAfterFormat;
-        if (type.equals(Constants.MovieApi.DOMAIN_BACKDROP_IMAGE)) {
-            typeAfterFormat = String.format(type, movies.get(index).getBackdropImage());
-        } else {
-            typeAfterFormat = String.format(type, movies.get(index).getPosterImage());
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.view_main_item_wrapper:
+                startDetailActivity(MOVIE_MAIN_INDEX);
+                return;
+            case R.id.view_sub_item1_wrapper:
+                startDetailActivity(MOVIE_SUB1_INDEX);
+                return;
+            case R.id.view_sub_item2_wrapper:
+                startDetailActivity(MOVIE_SUB2_INDEX);
+                return;
+            case R.id.view_sub_item3_wrapper:
+                startDetailActivity(MOVIE_SUB3_INDEX);
         }
-        return imageUrl.append(typeAfterFormat).toString();
+    }
+
+    private void startDetailActivity(int movieIndex) {
+        startActivity(DetailActivity.getInstance(getContext(), mMovies.get(movieIndex)));
+    }
+
+    private void glideForImage(int movieIndex, String type, ImageView image){
+        Glide.with(getContext()).load(mMovies.get(movieIndex).createImageUrl(type)).into(image);
     }
 }
