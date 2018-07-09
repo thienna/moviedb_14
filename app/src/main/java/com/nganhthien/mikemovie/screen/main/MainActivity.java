@@ -1,33 +1,66 @@
 package com.nganhthien.mikemovie.screen.main;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.nganhthien.mikemovie.R;
+import com.nganhthien.mikemovie.data.model.Genre;
+import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.screen.BaseActivity;
+import com.nganhthien.mikemovie.screen.detail.DetailActivity;
+import com.nganhthien.mikemovie.screen.favorite.FavoriteFragment;
 import com.nganhthien.mikemovie.screen.home.HomeFragment;
+import com.nganhthien.mikemovie.screen.home.HomeMoviesFragment;
+import com.nganhthien.mikemovie.screen.more.MoreFragment;
+import com.nganhthien.mikemovie.screen.search.SearchFragment;
 
-public class MainActivity extends BaseActivity implements MainContract.View {
+import java.util.List;
 
+import static com.nganhthien.mikemovie.data.model.MovieType.MOST_POPULAR;
+import static com.nganhthien.mikemovie.data.model.MovieType.NOW_PLAYING;
+import static com.nganhthien.mikemovie.data.model.MovieType.TOP_RATED;
+import static com.nganhthien.mikemovie.data.model.MovieType.UPCOMING;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+public class MainActivity extends BaseActivity implements MainContract.View,
+        SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener,
+        HomeMoviesFragment.OnMoreMovieClickListener, HomeFragment.OnClickSearchMoviesByGenre, MainBottomSheetRecyclerAdapter.OnRecyclerViewItemClickListener {
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation_bottom);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        setContentViewForFrameLayout(new HomeFragment());
-    }
-
+    private final float BOTTOM_SHEET_SLIDE_OFFSET = 0.1f;
+    private MainContract.Presenter mPresenter;
+    private Fragment mFragment;
+    private HomeFragment mHomeFragment;
+    private FavoriteFragment mFavoriteFragment;
+    private MoreFragment mMoreFragment;
+    private SearchFragment mSearchFragment;
+    private FragmentManager mFragmentManager;
+    private BottomNavigationView mBottomNavigationView;
+    private ConstraintLayout mBottomSheet;
+    private BottomSheetBehavior mBottomSheetBehavior;
+    private ImageButton mCloseBottomSheetButton;
+    private TextView mBottomSheetPeekTitle;
+    private RecyclerView mBottomSheetRecycler;
+    private MainBottomSheetRecyclerAdapter mBottomSheetRecyclerAdapter;
+    private SearchView mSearchView;
+    private MenuItem mSearchMenu;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -35,24 +68,209 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    setContentViewForFrameLayout(new HomeFragment());
+                    hideShowFragment(mFragment, mHomeFragment);
+                    mFragment = mHomeFragment;
                     return true;
                 // Have not yet others frag
                 case R.id.navigation_favorite:
-                    setContentViewForFrameLayout(new HomeFragment());
+                    hideShowFragment(mFragment, mFavoriteFragment);
+                    mFragment = mFavoriteFragment;
                     return true;
                 case R.id.navigation_more:
-                    setContentViewForFrameLayout(new HomeFragment());
+                    hideShowFragment(mFragment, mMoreFragment);
+                    mFragment = mMoreFragment;
                     return true;
             }
             return false;
         }
     };
 
-    private void setContentViewForFrameLayout(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frame_container, fragment)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        initView();
+        createFragments();
+        mPresenter = new MainPresenter();
+        mPresenter.setView(this);
+        mBottomSheetRecycler.setAdapter(mBottomSheetRecyclerAdapter);
+
+        if (!isNetworkAvailable()) {
+            showDialogNoInternet();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu_search, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setIconifiedByDefault(true);
+        mSearchView.setOnQueryTextListener(this);
+        mSearchMenu = menu.findItem(R.id.action_search);
+        mSearchMenu.setOnActionExpandListener(this);
+        return true;
+    }
+
+    @Override
+    public void searchMoviesByGenre(Genre genre) {
+        mSearchMenu.expandActionView();
+        mSearchView.setQuery(genre.getName(), false);
+        mPresenter.loadMoviesByGenre(genre.getId());
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        mSearchView.setQuery(query, false);
+        mSearchFragment.searchForResult(query);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        mBottomNavigationView.setVisibility(View.GONE);
+        mFragmentManager.beginTransaction()
+                .add(R.id.frame_container, mSearchFragment)
+                .hide(mFragment)
+                .addToBackStack(null)
                 .commit();
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        mBottomNavigationView.setVisibility(View.VISIBLE);
+        mFragmentManager.popBackStack();
+        return true;
+    }
+
+    @Override
+    public void expandingBottomSheet(String type) {
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        switch (type) {
+            case MOST_POPULAR:
+                mBottomSheetPeekTitle.setText(getResources().getString(R.string.most_popular));
+                break;
+            case NOW_PLAYING:
+                mBottomSheetPeekTitle.setText(getResources().getString(R.string.now_playing));
+                break;
+            case TOP_RATED:
+                mBottomSheetPeekTitle.setText(getResources().getString(R.string.top_rate));
+                break;
+            case UPCOMING:
+                mBottomSheetPeekTitle.setText(getResources().getString(R.string.upcoming));
+                break;
+            default:
+                mBottomSheetPeekTitle.setText(getResources().getString(R.string.app_name));
+        }
+        mPresenter.loadMoviesByType(type);
+    }
+
+    @Override
+    public void showLoadMoviesByGenreSuccess(List<Movie> movies) {
+        mSearchFragment.showMoviesByGenre(movies);
+    }
+
+    @Override
+    public void showLoadMoviesByGenreFailed(Exception e) {
+    }
+
+    @Override
+    public void showLoadMoviesByTypeSuccess(List<Movie> movies) {
+        mBottomSheetRecyclerAdapter.setData(movies);
+    }
+
+    @Override
+    public void showLoadMoviesByTypeFailed(Exception e) {
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onClickGenresRecyclerViewItem(Movie movie) {
+        startActivity(DetailActivity.getInstance(this, movie));
+    }
+
+    private void initView() {
+        mBottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation_bottom);
+        mBottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mFragmentManager = getSupportFragmentManager();
+        mBottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mCloseBottomSheetButton = findViewById(R.id.bottom_sheet_close_button);
+        mBottomSheetPeekTitle = findViewById(R.id.bottom_sheet_peek_title);
+        mBottomSheetRecycler = findViewById(R.id.recycler_movies);
+        mBottomSheetRecyclerAdapter = new MainBottomSheetRecyclerAdapter(this);
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (slideOffset >= BOTTOM_SHEET_SLIDE_OFFSET) {
+                    mBottomNavigationView.setVisibility(View.GONE);
+                } else {
+                    mBottomNavigationView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mCloseBottomSheetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
+    }
+
+    private void hideShowFragment(Fragment hide, Fragment show) {
+        mFragmentManager.beginTransaction().hide(hide).show(show).commit();
+    }
+
+    private void createFragments() {
+        mSearchFragment = SearchFragment.newInstance();
+        mHomeFragment = HomeFragment.newInstance();
+        mFavoriteFragment = FavoriteFragment.newInstance();
+        mMoreFragment = MoreFragment.newInstance();
+        addHideFragment(mFavoriteFragment);
+        addHideFragment(mMoreFragment);
+        mFragmentManager.beginTransaction().add(R.id.frame_container, mHomeFragment).commit();
+        mFragment = mHomeFragment;
+    }
+
+    private void addHideFragment(Fragment fragment) {
+        mFragmentManager.beginTransaction().add(R.id.frame_container, fragment).hide(fragment).commit();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void showDialogNoInternet() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.app_name));
+        builder.setMessage(getString(R.string.dialog_no_internet));
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

@@ -46,16 +46,6 @@
                 app:layout_constraintStart_toEndOf="@+id/image_toolbar_movie_icon"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/image_toolbar_search_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:paddingEnd="@dimen/dp_8"
-                android:paddingStart="@dimen/dp_16"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_search_white" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.Toolbar>
@@ -80,5 +70,14 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/navigation_bottom" />
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/bottomsheet_movies"/>
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </android.support.constraint.ConstraintLayout>

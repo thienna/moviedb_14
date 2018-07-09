@@ -14,4 +14,26 @@
     <string name="overview">Overview</string>
     <string name="casts">Casts</string>
     <string name="production_companies">Production Companies</string>
+    <string name="setting">Setting</string>
+    <string name="about">About</string>
+    <string name="delete_search_history">Delete search history</string>
+    <string name="mode_3g">3G Mode</string>
+    <string name="bug_report">Bug Report</string>
+    <string name="version_history">Version 1.0.1</string>
+    <string name="player_error">Error initializing YouTube player: %s</string>
+    <string name="seek_to">Jump To</string>
+    <string name="seek_to_hint">Seconds</string>
+    <string name="buffering">Buffering</string>
+    <string name="stopped">Stopped</string>
+    <string name="paused">Paused</string>
+    <string name="playing">Playing</string>
+    <string name="more_trailers">More trailers</string>
+    <string name="no_trailers">This movie has no trailer.</string>
+    <string name="birth_day">Birth day:</string>
+    <string name="popular">Popular:</string>
+    <string name="biography">Biography</string>
+    <string name="related_movies">Related movies</string>
+    <string name="headquarters">Headquarters:</string>
+    <string name="origin_country">Origin country:</string>
+    <string name="dialog_no_internet">No internet connection.</string>
 </resources>

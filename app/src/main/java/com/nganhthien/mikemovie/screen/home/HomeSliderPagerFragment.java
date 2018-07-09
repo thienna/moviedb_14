@@ -18,8 +18,13 @@ import com.nganhthien.mikemovie.R;
 public class HomeSliderPagerFragment extends Fragment {
     // the fragment initialization parameters
     private static final String ARGUMENT_PAGE = "ARG_PAGE";
-    private static final int IMAGE_SCALE_HEIGHT = 500;
-    private static final int IMAGE_SCALE_WIDTH = 300;
+    private static final int IMAGE_SCALE_HEIGHT = 300;
+    private static final int IMAGE_SCALE_WIDTH = 600;
+    private static final int IMAGE_BANNER_1 = 1;
+    private static final int IMAGE_BANNER_2 = 2;
+    private static final int IMAGE_BANNER_3 = 3;
+    private static final int IMAGE_BANNER_4 = 4;
+    private static final int IMAGE_BANNER_5 = 5;
 
     private int mPage;
 
@@ -54,11 +59,31 @@ public class HomeSliderPagerFragment extends Fragment {
         ImageView imageView = view.findViewById(R.id.image_slider_item);
 
         // Resize image
-        Glide.with(view)
-                .load(R.drawable.slider_image_sample)
-                .apply(new RequestOptions().override(IMAGE_SCALE_HEIGHT, IMAGE_SCALE_WIDTH))
-                .into(imageView);
+        switch (mPage) {
+            case IMAGE_BANNER_1:
+                glideResizeImage(view, imageView, R.drawable.slider_image_sample);
+                break;
+            case IMAGE_BANNER_2:
+                glideResizeImage(view, imageView, R.drawable.slider_image_sample2);
+                break;
+            case IMAGE_BANNER_3:
+                glideResizeImage(view, imageView, R.drawable.slider_image_sample3);
+                break;
+            case IMAGE_BANNER_4:
+                glideResizeImage(view, imageView, R.drawable.slider_image_sample4);
+                break;
+            case IMAGE_BANNER_5:
+                glideResizeImage(view, imageView, R.drawable.slider_image_sample5);
+                break;
+        }
 
         return view;
+    }
+
+    private void glideResizeImage(View view, ImageView imageView, int imageId) {
+        Glide.with(view)
+                .load(imageId)
+                .apply(new RequestOptions().override(IMAGE_SCALE_WIDTH, IMAGE_SCALE_HEIGHT))
+                .into(imageView);
     }
 }

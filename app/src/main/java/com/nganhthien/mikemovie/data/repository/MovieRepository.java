@@ -28,6 +28,21 @@ public class MovieRepository
         mMovieRemoteDataSource.loadMoviesRemote(type, listener);
     }
 
+    @Override
+    public void loadMoviesByGenre(int genreId, MovieDataSource.OnFetchDataListener listener) {
+        mMovieRemoteDataSource.loadMoviesByGenre(genreId, listener);
+    }
+
+    @Override
+    public void loadMoviesByPerson(String personName, MovieDataSource.OnFetchDataListener listener) {
+        mMovieRemoteDataSource.loadMoviesByPerson(personName, listener);
+    }
+
+    @Override
+    public void loadMoviesByCompany(int companyId, MovieDataSource.OnFetchDataListener listener) {
+        mMovieRemoteDataSource.loadMoviesByCompany(companyId, listener);
+    }
+
     private MovieRepository(
             @NonNull MovieDataSource.LocalDataSource movieLocalDataSource,
             @NonNull MovieDataSource.RemoteDataSource movieRemoteDataSource) {

@@ -15,6 +15,12 @@ public interface MovieDataSource {
 
     interface RemoteDataSource {
         void loadMoviesRemote(String type, OnFetchDataListener listener);
+
+        void loadMoviesByGenre(int genreId, OnFetchDataListener listener);
+
+        void loadMoviesByPerson(String personName, OnFetchDataListener listener);
+
+        void loadMoviesByCompany(int companyId, OnFetchDataListener listener);
     }
 
     interface OnFetchDataListener {

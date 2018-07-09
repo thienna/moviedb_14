@@ -37,6 +37,9 @@ public final class Constants {
         public static final String GENRES_LIST_PATH = "genre/movie/list";
         public static final String MOVIE_CREDITS = "movie/%s/credits";
         public static final String MOVIE_DETAIL = "movie/";
+        public static final String MOVIE_TRAILER = "movie/%s/videos";
+        public static final String MOVIE_BY_GENRE = "genre/%s/movies";
+        public static final String PERSON_DETAIL = "person/";
 
         public static final String PARAM_KEY_LANGUAGE = "language=";
         public static final String PARAM_KEY_API_KEY = "api_key=";

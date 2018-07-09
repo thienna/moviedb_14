@@ -1,6 +1,7 @@
 package com.nganhthien.mikemovie.screen.home;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.nganhthien.mikemovie.R;
@@ -53,6 +53,12 @@ public class HomeMoviesFragment extends Fragment
     private View mViewWrapperSubItem3;
     private List<Movie> mMovies;
     private String mType;
+    private TextView mTextMore;
+    private OnMoreMovieClickListener mOnMoreMovieClickListener;
+
+    public HomeMoviesFragment() {
+        // Required empty public constructor
+    }
 
     public static HomeMoviesFragment newInstance(String type) {
         HomeMoviesFragment fragment = new HomeMoviesFragment();
@@ -62,8 +68,10 @@ public class HomeMoviesFragment extends Fragment
         return fragment;
     }
 
-    public HomeMoviesFragment() {
-        // Required empty public constructor
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mOnMoreMovieClickListener = (OnMoreMovieClickListener) context;
     }
 
     @Override
@@ -116,6 +124,8 @@ public class HomeMoviesFragment extends Fragment
         mViewWrapperSubItem1 = view.findViewById(R.id.view_sub_item1_wrapper);
         mViewWrapperSubItem2 = view.findViewById(R.id.view_sub_item2_wrapper);
         mViewWrapperSubItem3 = view.findViewById(R.id.view_sub_item3_wrapper);
+
+        mTextMore = view.findViewById(R.id.text_more_movie_special_list);
     }
 
     @Override
@@ -132,6 +142,8 @@ public class HomeMoviesFragment extends Fragment
         mViewWrapperSubItem2.setOnClickListener(this);
         mViewWrapperSubItem3.setOnClickListener(this);
 
+        mTextMore.setOnClickListener(this);
+
         glideForImage(MOVIE_MAIN_INDEX,
                 Constants.MovieApi.DOMAIN_BACKDROP_IMAGE, mImageMainItemBackdrop);
         glideForImage(MOVIE_MAIN_INDEX,
@@ -146,7 +158,6 @@ public class HomeMoviesFragment extends Fragment
 
     @Override
     public void showMoviesFailed(Exception e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -154,15 +165,19 @@ public class HomeMoviesFragment extends Fragment
         switch (view.getId()) {
             case R.id.view_main_item_wrapper:
                 startDetailActivity(MOVIE_MAIN_INDEX);
-                return;
+                break;
             case R.id.view_sub_item1_wrapper:
                 startDetailActivity(MOVIE_SUB1_INDEX);
-                return;
+                break;
             case R.id.view_sub_item2_wrapper:
                 startDetailActivity(MOVIE_SUB2_INDEX);
-                return;
+                break;
             case R.id.view_sub_item3_wrapper:
                 startDetailActivity(MOVIE_SUB3_INDEX);
+                break;
+            case R.id.text_more_movie_special_list:
+                mOnMoreMovieClickListener.expandingBottomSheet(mType);
+                break;
         }
     }
 
@@ -170,7 +185,11 @@ public class HomeMoviesFragment extends Fragment
         startActivity(DetailActivity.getInstance(getContext(), mMovies.get(movieIndex)));
     }
 
-    private void glideForImage(int movieIndex, String type, ImageView image){
+    private void glideForImage(int movieIndex, String type, ImageView image) {
         Glide.with(getContext()).load(mMovies.get(movieIndex).createImageUrl(type)).into(image);
+    }
+
+    public interface OnMoreMovieClickListener {
+        void expandingBottomSheet(String type);
     }
 }

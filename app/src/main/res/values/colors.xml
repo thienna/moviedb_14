@@ -7,4 +7,5 @@
     <color name="color_text_title">#3C4858</color>
     <color name="color_text_sub_title">#47525E</color>
     <color name="color_cast_item_background">#5A6978</color>
+    <color name="color_search_item_overview">#969FAA</color>
 </resources>

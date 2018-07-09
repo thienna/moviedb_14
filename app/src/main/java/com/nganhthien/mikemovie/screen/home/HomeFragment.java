@@ -1,6 +1,7 @@
 package com.nganhthien.mikemovie.screen.home;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Genre;
@@ -44,9 +44,15 @@ public class HomeFragment extends Fragment
 
     // Setup for Genre RecyclerView
     private HomeGenresRecyclerAdapter mHomeGenresRecyclerAdapter;
+    private OnClickSearchMoviesByGenre mOnClickSearchMoviesByGenre;
 
     public HomeFragment() {
         // Required empty public constructor
+    }
+
+    public static HomeFragment newInstance() {
+        HomeFragment fragment = new HomeFragment();
+        return fragment;
     }
 
     @Override
@@ -103,13 +109,18 @@ public class HomeFragment extends Fragment
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mOnClickSearchMoviesByGenre = (OnClickSearchMoviesByGenre) context;
+    }
+
+    @Override
     public void showLoadGenresSuccess(List<Genre> genres) {
         mHomeGenresRecyclerAdapter.setData(genres);
     }
 
     @Override
     public void showLoadGenresFailed(Exception e) {
-        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -117,7 +128,7 @@ public class HomeFragment extends Fragment
         if (item == null) {
             return;
         }
-        Toast.makeText(getContext(), item.toString(), Toast.LENGTH_LONG).show();
+        mOnClickSearchMoviesByGenre.searchMoviesByGenre(item);
     }
 
     private void initSlider(View view) {
@@ -147,5 +158,9 @@ public class HomeFragment extends Fragment
 
     private void stopSliderInterval() {
         mSliderHandler.removeCallbacks(mSliderInterval);
+    }
+
+    public interface OnClickSearchMoviesByGenre {
+        void searchMoviesByGenre(Genre genre);
     }
 }
