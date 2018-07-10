@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dp_4"
+    android:padding="@dimen/dp_4">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/image_movies_item_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="@dimen/dp_16"
+        app:cardElevation="@dimen/dp_8"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/image_movies_item"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_200"
+            android:scaleType="centerCrop"
+            android:src="@drawable/movie_detail_backdrop_sample" />
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/text_movies_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingEnd="@dimen/dp_16"
+        android:paddingStart="@dimen/dp_16"
+        android:text="@string/sample_text"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="@color/color_text_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_movies_item_card" />
+
+    <ImageView
+        android:id="@+id/image_ic_movies_item_rating"
+        android:layout_width="@dimen/dp_20"
+        android:layout_height="@dimen/dp_20"
+        android:layout_marginBottom="@dimen/dp_8"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:layout_marginStart="@dimen/dp_16"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_movies_title"
+        app:srcCompat="@drawable/ic_star_yellow_24dp" />
+
+    <TextView
+        android:id="@+id/text_movies_item_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_4"
+        android:text="@string/rating"
+        android:textColor="@color/color_text_sub_title"
+        app:layout_constraintStart_toEndOf="@id/image_ic_movies_item_rating"
+        app:layout_constraintTop_toBottomOf="@id/text_movies_title" />
+
+    <TextView
+        android:id="@+id/text_movies_item_rating_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_4"
+        android:text="@string/sample_text"
+        android:textColor="@color/color_text_sub_title"
+        app:layout_constraintStart_toEndOf="@+id/text_movies_item_rating"
+        app:layout_constraintTop_toBottomOf="@id/text_movies_title" />
+
+</android.support.constraint.ConstraintLayout>

@@ -121,12 +121,14 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mSearchMenu.expandActionView();
         mSearchView.setQuery(genre.getName(), false);
         mPresenter.loadMoviesByGenre(genre.getId());
+        mSearchView.clearFocus();
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
         mSearchView.setQuery(query, false);
         mSearchFragment.searchForResult(query);
+        mSearchView.clearFocus();
         return true;
     }
 

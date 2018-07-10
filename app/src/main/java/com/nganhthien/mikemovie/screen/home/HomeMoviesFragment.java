@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.repository.MovieRepository;
@@ -186,7 +187,10 @@ public class HomeMoviesFragment extends Fragment
     }
 
     private void glideForImage(int movieIndex, String type, ImageView image) {
-        Glide.with(getContext()).load(mMovies.get(movieIndex).createImageUrl(type)).into(image);
+        Glide.with(getContext())
+                .load(mMovies.get(movieIndex).createImageUrl(type))
+                .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
+                .into(image);
     }
 
     public interface OnMoreMovieClickListener {
