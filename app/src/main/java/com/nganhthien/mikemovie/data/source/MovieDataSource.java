@@ -11,6 +11,13 @@ import java.util.List;
 public interface MovieDataSource {
 
     interface LocalDataSource {
+        void getAllMoviesLocal(OnGetAllFavoriteListener listener);
+
+        void addMovieLocal(Movie movie, OnAddFavoriteListener listener);
+
+        void removeMovieLocal(Movie movie, OnRemoveFavoriteListener listener);
+
+        void getAllFavoriteIds(OnGetFavoriteIdsListener listener);
     }
 
     interface RemoteDataSource {
@@ -27,5 +34,29 @@ public interface MovieDataSource {
         void onFetchMoviesSuccess(List<Movie> movies);
 
         void onFetchMoviesFailed(Exception e);
+    }
+
+    interface OnGetAllFavoriteListener {
+        void onGetAllFavoriteSuccess(List<Movie> movies);
+
+        void onGetAllFavoriteFailed(Exception e);
+    }
+
+    interface OnGetFavoriteIdsListener {
+        void onGetFavoriteIdsSuccess(List<Integer> ids);
+
+        void onGetFavoriteIdsFailed(Exception e);
+    }
+
+    interface OnAddFavoriteListener {
+        void onAddFavoriteSuccess(Movie movie);
+
+        void onAddFavoriteFailed(Exception e);
+    }
+
+    interface OnRemoveFavoriteListener {
+        void onRemoveFavoriteSuccess(Movie movie);
+
+        void onRemoveFavoriteFailed(Exception e);
     }
 }

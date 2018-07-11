@@ -2,8 +2,6 @@ package com.nganhthien.mikemovie.screen.main;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -11,7 +9,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +22,7 @@ import android.widget.TextView;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Genre;
 import com.nganhthien.mikemovie.data.model.Movie;
+import com.nganhthien.mikemovie.data.repository.MovieRepository;
 import com.nganhthien.mikemovie.screen.BaseActivity;
 import com.nganhthien.mikemovie.screen.detail.DetailActivity;
 import com.nganhthien.mikemovie.screen.favorite.FavoriteFragment;
@@ -32,6 +30,7 @@ import com.nganhthien.mikemovie.screen.home.HomeFragment;
 import com.nganhthien.mikemovie.screen.home.HomeMoviesFragment;
 import com.nganhthien.mikemovie.screen.more.MoreFragment;
 import com.nganhthien.mikemovie.screen.search.SearchFragment;
+import com.nganhthien.mikemovie.utils.NetworkReceiver;
 
 import java.util.List;
 
@@ -42,7 +41,8 @@ import static com.nganhthien.mikemovie.data.model.MovieType.UPCOMING;
 
 public class MainActivity extends BaseActivity implements MainContract.View,
         SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener,
-        HomeMoviesFragment.OnMoreMovieClickListener, HomeFragment.OnClickSearchMoviesByGenre, MainBottomSheetRecyclerAdapter.OnRecyclerViewItemClickListener {
+        HomeMoviesFragment.OnMoreMovieClickListener, HomeFragment.OnClickSearchMoviesByGenre,
+        MainBottomSheetRecyclerAdapter.OnRecyclerViewItemClickListener {
 
     private final float BOTTOM_SHEET_SLIDE_OFFSET = 0.1f;
     private MainContract.Presenter mPresenter;
@@ -93,13 +93,11 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         setSupportActionBar(toolbar);
         initView();
         createFragments();
-        mPresenter = new MainPresenter();
+        mPresenter = new MainPresenter(MovieRepository.getInstance(this));
         mPresenter.setView(this);
         mBottomSheetRecycler.setAdapter(mBottomSheetRecyclerAdapter);
 
-        if (!isNetworkAvailable()) {
-            showDialogNoInternet();
-        }
+        initNetworkBroadcast();
     }
 
     @Override
@@ -121,12 +119,14 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mSearchMenu.expandActionView();
         mSearchView.setQuery(genre.getName(), false);
         mPresenter.loadMoviesByGenre(genre.getId());
+        mSearchView.clearFocus();
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
         mSearchView.setQuery(query, false);
         mSearchFragment.searchForResult(query);
+        mSearchView.clearFocus();
         return true;
     }
 
@@ -259,18 +259,24 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mFragmentManager.beginTransaction().add(R.id.frame_container, fragment).hide(fragment).commit();
     }
 
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
+//    private void showDialogNoInternet() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(getString(R.string.app_name));
+//        builder.setMessage(getString(R.string.dialog_no_internet));
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
+//    }
 
-    private void showDialogNoInternet() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.app_name));
-        builder.setMessage(getString(R.string.dialog_no_internet));
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    private void initNetworkBroadcast(){
+        initNetworkBroadcastReceiver(new NetworkReceiver.NetworkStateListener() {
+            @Override
+            public void onNetworkConnected() {
+            }
+
+            @Override
+            public void onNetworkDisconnected() {
+                showDialogNoInternet();
+            }
+        });
     }
 }

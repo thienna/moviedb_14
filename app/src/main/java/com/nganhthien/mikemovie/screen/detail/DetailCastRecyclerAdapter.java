@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Cast;
 
@@ -16,10 +17,12 @@ import java.util.List;
 
 public class DetailCastRecyclerAdapter extends RecyclerView.Adapter<DetailCastRecyclerAdapter.ViewHolder> {
 
+    private OnRecyclerViewItemClickListener mListener;
     private List<Cast> mCasts;
     private LayoutInflater mLayoutInflater;
 
-    public DetailCastRecyclerAdapter() {
+    public DetailCastRecyclerAdapter(OnRecyclerViewItemClickListener listener) {
+        mListener = listener;
     }
 
     @NonNull
@@ -29,7 +32,7 @@ public class DetailCastRecyclerAdapter extends RecyclerView.Adapter<DetailCastRe
             mLayoutInflater = LayoutInflater.from(parent.getContext());
         }
         View castView = mLayoutInflater.inflate(R.layout.item_cast, parent, false);
-        ViewHolder vh = new ViewHolder(castView);
+        ViewHolder vh = new ViewHolder(castView, mListener);
         return vh;
     }
 
@@ -54,19 +57,27 @@ public class DetailCastRecyclerAdapter extends RecyclerView.Adapter<DetailCastRe
         notifyDataSetChanged();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private Cast mItem;
         private TextView mCastRealName;
         private TextView mCastName;
         private ImageView mCastProfileImage;
         private View mItemView;
+        private OnRecyclerViewItemClickListener mListener;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, OnRecyclerViewItemClickListener listener) {
             super(itemView);
+            mListener = listener;
             mItemView = itemView;
             mCastName = itemView.findViewById(R.id.text_cast_name);
             mCastRealName = itemView.findViewById(R.id.text_cast_real_name);
             mCastProfileImage = itemView.findViewById(R.id.image_cast);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mListener.onClickGenresRecyclerViewItem(mItem.getId());
         }
 
         void bindData(Cast item) {
@@ -77,8 +88,13 @@ public class DetailCastRecyclerAdapter extends RecyclerView.Adapter<DetailCastRe
             mCastRealName.setText(item.getCharacter());
             Glide.with(mItemView)
                     .load(item.createImageUrl())
+                    .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
                     .into(mCastProfileImage);
             mItem = item;
         }
+    }
+
+    public interface OnRecyclerViewItemClickListener {
+        void onClickGenresRecyclerViewItem(int id);
     }
 }

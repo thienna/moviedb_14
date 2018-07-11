@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.repository.MovieRepository;
@@ -55,6 +57,7 @@ public class HomeMoviesFragment extends Fragment
     private String mType;
     private TextView mTextMore;
     private OnMoreMovieClickListener mOnMoreMovieClickListener;
+    private ProgressBar mProgressBar;
 
     public HomeMoviesFragment() {
         // Required empty public constructor
@@ -82,7 +85,7 @@ public class HomeMoviesFragment extends Fragment
         mType = getArguments().getString(ARGUMENT_PAGE);
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
         initView(view);
-        mPresenter = new HomeMoviesPresenter(MovieRepository.getInstance());
+        mPresenter = new HomeMoviesPresenter(MovieRepository.getInstance(getContext()));
         mPresenter.setView(this);
 
         switch (mType) {
@@ -126,6 +129,7 @@ public class HomeMoviesFragment extends Fragment
         mViewWrapperSubItem3 = view.findViewById(R.id.view_sub_item3_wrapper);
 
         mTextMore = view.findViewById(R.id.text_more_movie_special_list);
+        mProgressBar = view.findViewById(R.id.progress_indicator);
     }
 
     @Override
@@ -154,6 +158,7 @@ public class HomeMoviesFragment extends Fragment
                 Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageSubItem2Poster);
         glideForImage(MOVIE_SUB3_INDEX,
                 Constants.MovieApi.DOMAIN_POSTER_IMAGE, mImageSubItem3Poster);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -186,7 +191,10 @@ public class HomeMoviesFragment extends Fragment
     }
 
     private void glideForImage(int movieIndex, String type, ImageView image) {
-        Glide.with(getContext()).load(mMovies.get(movieIndex).createImageUrl(type)).into(image);
+        Glide.with(getContext())
+                .load(mMovies.get(movieIndex).createImageUrl(type))
+                .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
+                .into(image);
     }
 
     public interface OnMoreMovieClickListener {

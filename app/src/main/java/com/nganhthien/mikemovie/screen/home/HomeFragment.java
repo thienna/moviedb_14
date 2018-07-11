@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Genre;
@@ -45,6 +46,7 @@ public class HomeFragment extends Fragment
     // Setup for Genre RecyclerView
     private HomeGenresRecyclerAdapter mHomeGenresRecyclerAdapter;
     private OnClickSearchMoviesByGenre mOnClickSearchMoviesByGenre;
+    private ProgressBar mProgressBar;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -73,6 +75,7 @@ public class HomeFragment extends Fragment
 
         mHomeGenresRecyclerAdapter = new HomeGenresRecyclerAdapter(this);
         genreRecyclerView.setAdapter(mHomeGenresRecyclerAdapter);
+        mProgressBar = view.findViewById(R.id.progress_indicator);
 
         return view;
     }
@@ -116,6 +119,7 @@ public class HomeFragment extends Fragment
 
     @Override
     public void showLoadGenresSuccess(List<Genre> genres) {
+        mProgressBar.setVisibility(View.GONE);
         mHomeGenresRecyclerAdapter.setData(genres);
     }
 

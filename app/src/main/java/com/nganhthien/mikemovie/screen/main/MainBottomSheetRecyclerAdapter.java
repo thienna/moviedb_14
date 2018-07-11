@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.utils.Constants;
@@ -87,6 +88,7 @@ public class MainBottomSheetRecyclerAdapter
             mMovie = item;
             Glide.with(itemView.getContext())
                     .load(item.createImageUrl(Constants.MovieApi.DOMAIN_BACKDROP_IMAGE))
+                    .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
                     .into(mImageViewBackdrop);
             mTextViewMovieTitle.setText(item.getTitle());
             mTextViewMovieRating.setText(String.valueOf(item.getVoteAverage()));

@@ -1,7 +1,9 @@
 package com.nganhthien.mikemovie.data.repository;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.source.MovieDataSource;
 import com.nganhthien.mikemovie.data.source.local.MovieLocalDataSource;
 import com.nganhthien.mikemovie.data.source.remote.MovieRemoteDataSource;
@@ -23,6 +25,27 @@ public class MovieRepository
     @NonNull
     private MovieDataSource.RemoteDataSource mMovieRemoteDataSource;
 
+    private MovieRepository(
+            @NonNull MovieDataSource.LocalDataSource movieLocalDataSource,
+            @NonNull MovieDataSource.RemoteDataSource movieRemoteDataSource) {
+        mMovieLocalDataSource = checkNotNull(movieLocalDataSource);
+        mMovieRemoteDataSource = checkNotNull(movieRemoteDataSource);
+    }
+
+    public static synchronized MovieRepository getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new MovieRepository(checkNotNull(MovieLocalDataSource.getInstance(context)),
+                    checkNotNull(MovieRemoteDataSource.getsInstance()));
+        }
+
+        return sInstance;
+    }
+
+    public static void destroyInstance() {
+        sInstance = null;
+        MovieRemoteDataSource.destroyInstance();
+    }
+
     @Override
     public void loadMoviesRemote(String type, MovieDataSource.OnFetchDataListener listener) {
         mMovieRemoteDataSource.loadMoviesRemote(type, listener);
@@ -43,24 +66,23 @@ public class MovieRepository
         mMovieRemoteDataSource.loadMoviesByCompany(companyId, listener);
     }
 
-    private MovieRepository(
-            @NonNull MovieDataSource.LocalDataSource movieLocalDataSource,
-            @NonNull MovieDataSource.RemoteDataSource movieRemoteDataSource) {
-        mMovieLocalDataSource = checkNotNull(movieLocalDataSource);
-        mMovieRemoteDataSource = checkNotNull(movieRemoteDataSource);
+    @Override
+    public void getAllMoviesLocal(MovieDataSource.OnGetAllFavoriteListener listener) {
+        mMovieLocalDataSource.getAllMoviesLocal(listener);
     }
 
-    public static synchronized MovieRepository getInstance() {
-        if (sInstance == null) {
-            sInstance = new MovieRepository(checkNotNull(MovieLocalDataSource.getInstance()),
-                    checkNotNull(MovieRemoteDataSource.getsInstance()));
-        }
-
-        return sInstance;
+    @Override
+    public void addMovieLocal(Movie movie, MovieDataSource.OnAddFavoriteListener listener) {
+        mMovieLocalDataSource.addMovieLocal(movie, listener);
     }
 
-    public static void destroyInstance() {
-        sInstance = null;
-        MovieRemoteDataSource.destroyInstance();
+    @Override
+    public void removeMovieLocal(Movie movie, MovieDataSource.OnRemoveFavoriteListener listener) {
+        mMovieLocalDataSource.removeMovieLocal(movie, listener);
+    }
+
+    @Override
+    public void getAllFavoriteIds(MovieDataSource.OnGetFavoriteIdsListener listener) {
+        mMovieLocalDataSource.getAllFavoriteIds(listener);
     }
 }

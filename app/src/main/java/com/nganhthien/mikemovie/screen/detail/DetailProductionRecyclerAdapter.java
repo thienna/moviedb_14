@@ -9,8 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Production;
+import com.nganhthien.mikemovie.screen.company.CompanyActivity;
 
 import java.util.List;
 
@@ -55,25 +57,33 @@ public class DetailProductionRecyclerAdapter
         notifyDataSetChanged();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mProductionName;
         private ImageView mProductionImage;
-        private View mItemView;
+        private Production mItem;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mItemView = itemView;
             mProductionName = itemView.findViewById(R.id.text_production);
             mProductionImage = itemView.findViewById(R.id.image_production);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            itemView.getContext()
+                    .startActivity(CompanyActivity.getInstance(itemView.getContext(), mItem.getId()));
         }
 
         void bindData(Production item) {
             if (item == null) {
                 return;
             }
+            mItem = item;
             mProductionName.setText(item.getName());
-            Glide.with(mItemView)
+            Glide.with(itemView)
                     .load(item.createImageUrl())
+                    .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
                     .into(mProductionImage);
         }
     }

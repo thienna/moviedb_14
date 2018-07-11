@@ -12,17 +12,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.nganhthien.mikemovie.R;
 import com.nganhthien.mikemovie.data.model.Cast;
 import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.model.Production;
+import com.nganhthien.mikemovie.data.model.Trailer;
+import com.nganhthien.mikemovie.data.repository.MovieRepository;
 import com.nganhthien.mikemovie.screen.BaseActivity;
+import com.nganhthien.mikemovie.screen.person.PersonActivity;
+import com.nganhthien.mikemovie.screen.youtube.YoutubeActivity;
 import com.nganhthien.mikemovie.utils.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements DetailContract.View, View.OnClickListener {
-    public static final String EXTRA_MOVIE = "EXTRA_MOVIE";
+public class DetailActivity extends BaseActivity
+        implements DetailContract.View, View.OnClickListener,
+        DetailCastRecyclerAdapter.OnRecyclerViewItemClickListener {
+    private static final String EXTRA_MOVIE = "EXTRA_MOVIE";
     private DetailContract.Presenter mPresenter;
     private Movie mMovie;
     private ImageView mImageBackdrop;
@@ -36,6 +44,9 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
     private RecyclerView mRecyclerViewProduction;
     private DetailCastRecyclerAdapter mDetailCastRecyclerAdapter;
     private DetailProductionRecyclerAdapter mDetailProductionRecyclerAdapter;
+    private ImageView mPlayYoutubeButton;
+    private List<Trailer> mTrailers;
+    private ImageView mFloatingFavoriteButton;
 
     public static Intent getInstance(Context context, Movie movie) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -51,16 +62,18 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
         mMovie = getIntent().getParcelableExtra(EXTRA_MOVIE);
         initView();
         initViewContent();
-        mPresenter = new DetailPresenter();
+        mPresenter = new DetailPresenter(MovieRepository.getInstance(this));
         mPresenter.setView(this);
         mPresenter.loadCastRemote(mMovie.getId());
         mPresenter.loadProductionRemote(mMovie.getId());
+        mPresenter.loadTrailerRemote(mMovie.getId());
 
         mRecyclerViewCast.setAdapter(mDetailCastRecyclerAdapter);
         mRecyclerViewProduction.setAdapter(mDetailProductionRecyclerAdapter);
 
         findViewById(R.id.image_ic_detail_back).setOnClickListener(this);
         mTextOverview.setOnClickListener(this);
+        mPlayYoutubeButton.setOnClickListener(this);
     }
 
     @Override
@@ -70,7 +83,6 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
 
     @Override
     public void showLoadProductionFailed(Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -80,7 +92,29 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
 
     @Override
     public void showLoadCastFailed(Exception e) {
-        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showLoadTrailerSuccess(List<Trailer> trailers) {
+        mTrailers = trailers;
+    }
+
+    @Override
+    public void showLoadTrailerFailed(Exception e) {
+    }
+
+    @Override
+    public void onClickGenresRecyclerViewItem(int id) {
+        startActivity(PersonActivity.getInstance(this, id));
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        mMovie = intent.getParcelableExtra(EXTRA_MOVIE);
+        initViewContent();
+        mPresenter.loadCastRemote(mMovie.getId());
+        mPresenter.loadProductionRemote(mMovie.getId());
+        mPresenter.loadTrailerRemote(mMovie.getId());
     }
 
     private void initView() {
@@ -92,17 +126,22 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
         mTextOverview = findViewById(R.id.text_detail_overview);
         mRecyclerViewCast = findViewById(R.id.recycler_detail_casts);
         mRecyclerViewCast.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        mDetailCastRecyclerAdapter = new DetailCastRecyclerAdapter();
+        mDetailCastRecyclerAdapter = new DetailCastRecyclerAdapter(this);
         mRecyclerViewProduction = findViewById(R.id.recycler_detail_production);
         mDetailProductionRecyclerAdapter = new DetailProductionRecyclerAdapter();
+        mPlayYoutubeButton = findViewById(R.id.image_ic_detail_play);
+        mFloatingFavoriteButton = findViewById(R.id.float_favorite);
+        mFloatingFavoriteButton.setOnClickListener(this);
     }
 
     private void initViewContent() {
         Glide.with(this)
                 .load(mMovie.createImageUrl(Constants.MovieApi.DOMAIN_BACKDROP_IMAGE))
+                .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
                 .into(mImageBackdrop);
         Glide.with(this)
                 .load(mMovie.createImageUrl(Constants.MovieApi.DOMAIN_POSTER_IMAGE))
+                .apply(new RequestOptions().placeholder(R.drawable.movie_detail_poster_sample))
                 .into(mImagePoster);
         mTextTitle.setText(mMovie.getTitle());
         mTextRating.setText(String.valueOf(mMovie.getVoteAverage()));
@@ -118,6 +157,11 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
             case R.id.text_detail_overview:
                 toggleExpandLine();
                 break;
+            case R.id.image_ic_detail_play:
+                playYoutubeVideo((ArrayList<Trailer>) mTrailers, mMovie);
+                break;
+            case R.id.float_favorite:
+                break;
             // TODO: add more onClick event here
         }
     }
@@ -129,5 +173,13 @@ public class DetailActivity extends BaseActivity implements DetailContract.View,
             mTextOverview.setMaxLines(Constants.DETAIL_SCREEN_OVEVERVIEW_MAXLINE);
         }
         mIsTextOverviewExpanded = !mIsTextOverviewExpanded;
+    }
+
+    private void playYoutubeVideo(ArrayList<Trailer> trailers, Movie movie) {
+        if (trailers == null) {
+            Toast.makeText(this, getString(R.string.no_trailers), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        startActivity(YoutubeActivity.getInstance(this, trailers, movie));
     }
 }

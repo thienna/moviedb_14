@@ -15,8 +15,8 @@ public class MainPresenter implements MainContract.Presenter {
     private MainContract.View mView;
     private MovieRepository mMovieRepository;
 
-    public MainPresenter () {
-        mMovieRepository = MovieRepository.getInstance();
+    public MainPresenter (MovieRepository movieRepository) {
+        mMovieRepository = movieRepository;
     }
 
     @Override

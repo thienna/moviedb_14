@@ -10,6 +10,17 @@ import com.nganhthien.mikemovie.utils.Constants;
  */
 
 public class Movie implements Parcelable {
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     private int mId;
     private String mTitle;
     private String mOverview;
@@ -17,6 +28,7 @@ public class Movie implements Parcelable {
     private String mPosterImage;
     private String mBackdropImage;
     private String mReleaseDate;
+    private boolean mIsFavorite;
 
     public Movie(int id, String title) {
         mId = id;
@@ -32,18 +44,6 @@ public class Movie implements Parcelable {
         mBackdropImage = in.readString();
         mReleaseDate = in.readString();
     }
-
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
 
     @Override
     public int describeContents() {
@@ -117,6 +117,14 @@ public class Movie implements Parcelable {
         mReleaseDate = releaseDate;
     }
 
+    public boolean isFavorite() {
+        return mIsFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        mIsFavorite = favorite;
+    }
+
     public String createImageUrl(String type) {
         StringBuilder url = new StringBuilder();
         url.append(Constants.UrlConfig.PROTOCOL);
@@ -142,5 +150,33 @@ public class Movie implements Parcelable {
 
         private JsonKey() {
         }
+    }
+
+    public static class DatabaseConfig {
+        // Tables
+        public static final String TABLE_NAME = "favorite_movies";
+
+        // Columns
+        public static final String ID = "movie_id";
+        public static final String TITLE = "title";
+        public static final String VOTE_AVERAGE = "vote_average";
+        public static final String POSTER_PATH = "poster_image";
+        public static final String BACKDROP_PATH = "backdrop_image";
+        public static final String OVERVIEW = "overview";
+        public static final String RELEASE_DATE = "release_date";
+        public static final String TIMESTAMP = "timestamp";
+
+        // Queries
+        public static final String CREATE_TABLE =
+                Constants.DatabaseConfig.QUERY_CREATE_TABLE + TABLE_NAME + "(" +
+                        "id" + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        ID + " INTEGER, " +
+                        TITLE + " TEXT, " +
+                        VOTE_AVERAGE + " TEXT, " +
+                        POSTER_PATH + " TEXT, " +
+                        BACKDROP_PATH + " TEXT, " +
+                        OVERVIEW + " TEXT, " +
+                        RELEASE_DATE + " TEXT, " +
+                        TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP);";
     }
 }
