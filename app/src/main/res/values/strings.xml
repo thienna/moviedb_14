@@ -40,4 +40,8 @@
         internet for best experience.</string>
     <string name="dialog_no_result">No result.</string>
     <string name="no_favorite_items">No favorite items.</string>
+    <string name="add_favorite_success">Successfully added movie to favorite list.</string>
+    <string name="add_favorite_failed">Failed to add movie to favorite list.</string>
+    <string name="remove_favorite_success">Successfully removed movie to favorite list.</string>
+    <string name="remove_favorite_failed">Failed to remove movie to favorite list.</string>
 </resources>

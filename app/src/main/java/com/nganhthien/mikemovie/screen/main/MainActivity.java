@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nganhthien.mikemovie.R;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     private MainBottomSheetRecyclerAdapter mBottomSheetRecyclerAdapter;
     private SearchView mSearchView;
     private MenuItem mSearchMenu;
+    private ProgressBar mProgressBar;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -101,6 +103,12 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.options_menu_search, menu);
@@ -118,6 +126,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     public void searchMoviesByGenre(Genre genre) {
         mSearchMenu.expandActionView();
         mSearchView.setQuery(genre.getName(), false);
+        mProgressBar.setVisibility(View.VISIBLE);
         mPresenter.loadMoviesByGenre(genre.getId());
         mSearchView.clearFocus();
     }
@@ -155,6 +164,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
 
     @Override
     public void expandingBottomSheet(String type) {
+        mProgressBar.setVisibility(View.VISIBLE);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         switch (type) {
             case MOST_POPULAR:
@@ -178,6 +188,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     @Override
     public void showLoadMoviesByGenreSuccess(List<Movie> movies) {
         mSearchFragment.showMoviesByGenre(movies);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -187,6 +198,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     @Override
     public void showLoadMoviesByTypeSuccess(List<Movie> movies) {
         mBottomSheetRecyclerAdapter.setData(movies);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -217,6 +229,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mCloseBottomSheetButton = findViewById(R.id.bottom_sheet_close_button);
         mBottomSheetPeekTitle = findViewById(R.id.bottom_sheet_peek_title);
         mBottomSheetRecycler = findViewById(R.id.recycler_movies);
+        mProgressBar = findViewById(R.id.progress_indicator);
         mBottomSheetRecyclerAdapter = new MainBottomSheetRecyclerAdapter(this);
         mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -275,6 +288,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
 
             @Override
             public void onNetworkDisconnected() {
+                mProgressBar.setVisibility(View.GONE);
                 showDialogNoInternet();
             }
         });

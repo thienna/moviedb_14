@@ -1,6 +1,7 @@
 package com.nganhthien.mikemovie.screen.detail;
 
 import com.nganhthien.mikemovie.data.model.Cast;
+import com.nganhthien.mikemovie.data.model.Movie;
 import com.nganhthien.mikemovie.data.model.Production;
 import com.nganhthien.mikemovie.data.model.Trailer;
 import com.nganhthien.mikemovie.screen.BasePresenter;
@@ -21,6 +22,17 @@ public interface DetailContract {
 
         void showLoadTrailerFailed(Exception e);
 
+        void showFavoriteIdsSuccess(List<Integer> ids);
+
+        void showFavoriteIdsFailed();
+
+        void showAddFavoriteSuccess(Movie movie);
+
+        void showAddFavoriteFailed();
+
+        void showDeleteFavoriteSuccess(Movie movie);
+
+        void showDeleteFavoriteFailed();
     }
 
     interface Presenter extends BasePresenter<DetailContract.View> {
@@ -29,5 +41,11 @@ public interface DetailContract {
         void loadProductionRemote(int id);
 
         void loadTrailerRemote(int id);
+
+        void loadFavoriteIds();
+
+        void addMovieToFavorite(Movie movie);
+
+        void removeMovieFromFavorite(Movie movie);
     }
 }

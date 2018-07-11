@@ -2,12 +2,17 @@ package com.nganhthien.mikemovie.screen.detail;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +52,9 @@ public class DetailActivity extends BaseActivity
     private ImageView mPlayYoutubeButton;
     private List<Trailer> mTrailers;
     private ImageView mFloatingFavoriteButton;
+    private ProgressBar mProgressBar;
+    private List<Integer> mIds;
+    private ConstraintLayout mConstraintLayout;
 
     public static Intent getInstance(Context context, Movie movie) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -67,6 +75,7 @@ public class DetailActivity extends BaseActivity
         mPresenter.loadCastRemote(mMovie.getId());
         mPresenter.loadProductionRemote(mMovie.getId());
         mPresenter.loadTrailerRemote(mMovie.getId());
+        mPresenter.loadFavoriteIds();
 
         mRecyclerViewCast.setAdapter(mDetailCastRecyclerAdapter);
         mRecyclerViewProduction.setAdapter(mDetailProductionRecyclerAdapter);
@@ -117,6 +126,64 @@ public class DetailActivity extends BaseActivity
         mPresenter.loadTrailerRemote(mMovie.getId());
     }
 
+    @Override
+    public void showFavoriteIdsSuccess(List<Integer> ids) {
+        mIds = ids;
+        for (int i : mIds) {
+            if (mMovie.getId() == i){
+                mMovie.setFavorite(true);
+            }
+        }
+        if (mMovie.isFavorite()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
+                        ().getColor(R.color
+                        .colorPrimary)));
+            }
+        }
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showFavoriteIdsFailed() {
+    }
+
+    @Override
+    public void showAddFavoriteSuccess(Movie movie) {
+        mMovie.setFavorite(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
+                    ().getColor(R.color
+                    .colorPrimary)));
+        }
+        mProgressBar.setVisibility(View.GONE);
+        Snackbar.make(mConstraintLayout, R.string.add_favorite_success, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showAddFavoriteFailed() {
+        mProgressBar.setVisibility(View.GONE);
+        Snackbar.make(mConstraintLayout, R.string.add_favorite_failed, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showDeleteFavoriteSuccess(Movie movie) {
+        mMovie.setFavorite(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
+                    ().getColor(R.color
+                    .color_search_item_overview)));
+        }
+        mProgressBar.setVisibility(View.GONE);
+        Snackbar.make(mConstraintLayout, R.string.remove_favorite_success, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showDeleteFavoriteFailed() {
+        mProgressBar.setVisibility(View.GONE);
+        Snackbar.make(mConstraintLayout, R.string.remove_favorite_failed, Snackbar.LENGTH_LONG).show();
+    }
+
     private void initView() {
         mImageBackdrop = findViewById(R.id.image_detail_backdrop);
         mImagePoster = findViewById(R.id.image_detail_poster);
@@ -132,6 +199,8 @@ public class DetailActivity extends BaseActivity
         mPlayYoutubeButton = findViewById(R.id.image_ic_detail_play);
         mFloatingFavoriteButton = findViewById(R.id.float_favorite);
         mFloatingFavoriteButton.setOnClickListener(this);
+        mProgressBar = findViewById(R.id.progress_indicator);
+        mConstraintLayout = findViewById(R.id.constraint_container);
     }
 
     private void initViewContent() {
@@ -161,6 +230,12 @@ public class DetailActivity extends BaseActivity
                 playYoutubeVideo((ArrayList<Trailer>) mTrailers, mMovie);
                 break;
             case R.id.float_favorite:
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (mMovie.isFavorite()){
+                    mPresenter.removeMovieFromFavorite(mMovie);
+                } else {
+                    mPresenter.addMovieToFavorite(mMovie);
+                }
                 break;
             // TODO: add more onClick event here
         }
