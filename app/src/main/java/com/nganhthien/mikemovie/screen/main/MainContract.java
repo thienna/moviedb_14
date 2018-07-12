@@ -19,11 +19,17 @@ interface MainContract {
         void showLoadMoviesByTypeSuccess(List<Movie> movies);
 
         void showLoadMoviesByTypeFailed(Exception e);
+
+        void showLoadFavoriteIdsSuccess(List<Integer> result);
+
+        void showLoadFavoriteIdsFailed();
     }
 
     interface Presenter extends BasePresenter<MainContract.View> {
         void loadMoviesByGenre(int genreId);
 
         void loadMoviesByType(String type);
+
+        void loadFavoriteMoviesIds();
     }
 }

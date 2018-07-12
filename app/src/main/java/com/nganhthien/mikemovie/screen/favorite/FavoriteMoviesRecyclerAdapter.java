@@ -61,6 +61,24 @@ public class FavoriteMoviesRecyclerAdapter extends RecyclerView
         notifyDataSetChanged();
     }
 
+    public void clearData() {
+        if (mMovies == null) {
+            return;
+        }
+        mMovies.clear();
+        notifyDataSetChanged();
+    }
+
+    public void updateIndex(Movie movie) {
+        if (movie == null){
+            return;
+        }
+        int indexChanged = mMovies.indexOf(movie);
+        if (indexChanged > -1){
+            notifyItemChanged(indexChanged, movie);
+        }
+    }
+
     public interface OnRecyclerViewItemClickListener {
         void onClickFavoriteItem(Movie movie);
 
@@ -90,7 +108,7 @@ public class FavoriteMoviesRecyclerAdapter extends RecyclerView
 
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.float_favorite){
+            if (v.getId() == R.id.float_favorite) {
                 mListener.onClickFavoriteFloatButton(mMovie);
             } else {
                 mListener.onClickFavoriteItem(mMovie);
@@ -109,8 +127,10 @@ public class FavoriteMoviesRecyclerAdapter extends RecyclerView
             mTextViewMovieTitle.setText(item.getTitle());
             mTextViewMovieOverview.setText(item.getOverview());
             mTextViewMovieRating.setText(String.valueOf(item.getVoteAverage()));
-            if (mMovie.isFavorite()){
+            if (mMovie.isFavorite()) {
                 mFloatFavoriteButton.setImageResource(R.drawable.ic_favorite_main);
+            } else {
+                mFloatFavoriteButton.setImageResource(R.drawable.ic_favorite_white_40dp);
             }
         }
     }

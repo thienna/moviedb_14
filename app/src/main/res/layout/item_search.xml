@@ -100,6 +100,7 @@
             app:layout_constraintTop_toTopOf="@id/image_ic_search_item_rating" />
 
         <ImageView
+            android:id="@+id/image_float_favorite"
             android:layout_width="@dimen/dp_40"
             android:layout_height="@dimen/dp_40"
             android:layout_marginBottom="@dimen/dp_16"

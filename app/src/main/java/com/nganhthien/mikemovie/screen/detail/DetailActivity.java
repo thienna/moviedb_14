@@ -10,6 +10,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -55,6 +56,7 @@ public class DetailActivity extends BaseActivity
     private ProgressBar mProgressBar;
     private List<Integer> mIds;
     private ConstraintLayout mConstraintLayout;
+    private boolean mIsFavorite;
 
     public static Intent getInstance(Context context, Movie movie) {
         Intent intent = new Intent(context, DetailActivity.class);
@@ -120,10 +122,36 @@ public class DetailActivity extends BaseActivity
     @Override
     protected void onNewIntent(Intent intent) {
         mMovie = intent.getParcelableExtra(EXTRA_MOVIE);
+        Log.d("TAG", "onNewIntent: " + mMovie.toString());
         initViewContent();
         mPresenter.loadCastRemote(mMovie.getId());
         mPresenter.loadProductionRemote(mMovie.getId());
         mPresenter.loadTrailerRemote(mMovie.getId());
+        mPresenter.loadFavoriteIds();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
+                    ().getColor(R.color
+                    .color_search_item_overview)));
+        }
+
+        if (mIds == null || mIds.isEmpty()) {
+            return;
+        }
+
+        for (int i : mIds) {
+            if (mMovie.getId() == i){
+                mMovie.setFavorite(true);
+            }
+        }
+        
+        if (mMovie.isFavorite()) {
+            mIsFavorite = true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
+                        ().getColor(R.color
+                        .colorPrimary)));
+            }
+        }
     }
 
     @Override
@@ -134,13 +162,16 @@ public class DetailActivity extends BaseActivity
                 mMovie.setFavorite(true);
             }
         }
+        Log.d("TAG", "showFavoriteIdsSuccess: " + mMovie.toString());
         if (mMovie.isFavorite()) {
+            mIsFavorite = true;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mFloatingFavoriteButton.setBackgroundTintList(ColorStateList.valueOf(getResources
                         ().getColor(R.color
                         .colorPrimary)));
             }
         }
+        mFloatingFavoriteButton.setOnClickListener(this);
         mProgressBar.setVisibility(View.GONE);
     }
 
@@ -198,7 +229,6 @@ public class DetailActivity extends BaseActivity
         mDetailProductionRecyclerAdapter = new DetailProductionRecyclerAdapter();
         mPlayYoutubeButton = findViewById(R.id.image_ic_detail_play);
         mFloatingFavoriteButton = findViewById(R.id.float_favorite);
-        mFloatingFavoriteButton.setOnClickListener(this);
         mProgressBar = findViewById(R.id.progress_indicator);
         mConstraintLayout = findViewById(R.id.constraint_container);
     }

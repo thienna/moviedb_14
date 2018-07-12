@@ -43,7 +43,8 @@ import static com.nganhthien.mikemovie.data.model.MovieType.UPCOMING;
 public class MainActivity extends BaseActivity implements MainContract.View,
         SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener,
         HomeMoviesFragment.OnMoreMovieClickListener, HomeFragment.OnClickSearchMoviesByGenre,
-        MainBottomSheetRecyclerAdapter.OnRecyclerViewItemClickListener {
+        MainBottomSheetRecyclerAdapter.OnRecyclerViewItemClickListener,
+        SearchFragment.OnAddRemoveFavoriteSuccess, FavoriteFragment.OnAddRemoveFavoriteSuccess {
 
     private final float BOTTOM_SHEET_SLIDE_OFFSET = 0.1f;
     private MainContract.Presenter mPresenter;
@@ -63,6 +64,8 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     private SearchView mSearchView;
     private MenuItem mSearchMenu;
     private ProgressBar mProgressBar;
+    private List<Integer> mIds;
+    private boolean mIsNeedReloaded;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -75,6 +78,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
                     return true;
                 // Have not yet others frag
                 case R.id.navigation_favorite:
+                    mFavoriteFragment.updateIdsFromActivity();
                     hideShowFragment(mFragment, mFavoriteFragment);
                     mFragment = mFavoriteFragment;
                     return true;
@@ -98,6 +102,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mPresenter = new MainPresenter(MovieRepository.getInstance(this));
         mPresenter.setView(this);
         mBottomSheetRecycler.setAdapter(mBottomSheetRecyclerAdapter);
+        mPresenter.loadFavoriteMoviesIds();
 
         initNetworkBroadcast();
     }
@@ -126,7 +131,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     public void searchMoviesByGenre(Genre genre) {
         mSearchMenu.expandActionView();
         mSearchView.setQuery(genre.getName(), false);
-        mProgressBar.setVisibility(View.VISIBLE);
+        mPresenter.loadFavoriteMoviesIds();
         mPresenter.loadMoviesByGenre(genre.getId());
         mSearchView.clearFocus();
     }
@@ -187,6 +192,15 @@ public class MainActivity extends BaseActivity implements MainContract.View,
 
     @Override
     public void showLoadMoviesByGenreSuccess(List<Movie> movies) {
+        if (mIds != null && !mIds.isEmpty()) {
+            for (int i : mIds) {
+                for (Movie item : movies) {
+                    if (i == item.getId()) {
+                        item.setFavorite(true);
+                    }
+                }
+            }
+        }
         mSearchFragment.showMoviesByGenre(movies);
         mProgressBar.setVisibility(View.GONE);
     }
@@ -217,6 +231,26 @@ public class MainActivity extends BaseActivity implements MainContract.View,
     @Override
     public void onClickGenresRecyclerViewItem(Movie movie) {
         startActivity(DetailActivity.getInstance(this, movie));
+    }
+
+    @Override
+    public void showLoadFavoriteIdsSuccess(List<Integer> result) {
+        mIds = result;
+    }
+
+    @Override
+    public void showLoadFavoriteIdsFailed() {
+
+    }
+
+    @Override
+    public void updateIds() {
+        mFavoriteFragment.updateIdsFromActivity();
+    }
+
+    @Override
+    public void updateIdsFromFavorite() {
+        mFavoriteFragment.updateIdsFromActivity();
     }
 
     private void initView() {
@@ -272,15 +306,7 @@ public class MainActivity extends BaseActivity implements MainContract.View,
         mFragmentManager.beginTransaction().add(R.id.frame_container, fragment).hide(fragment).commit();
     }
 
-//    private void showDialogNoInternet() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(getString(R.string.app_name));
-//        builder.setMessage(getString(R.string.dialog_no_internet));
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//    }
-
-    private void initNetworkBroadcast(){
+    private void initNetworkBroadcast() {
         initNetworkBroadcastReceiver(new NetworkReceiver.NetworkStateListener() {
             @Override
             public void onNetworkConnected() {

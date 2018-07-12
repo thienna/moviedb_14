@@ -10,7 +10,7 @@ import java.util.List;
  * Created by ThienNA on 30/06/2018.
  */
 
-public class MainPresenter implements MainContract.Presenter {
+public class MainPresenter implements MainContract.Presenter, MovieDataSource.OnGetFavoriteIdsListener {
 
     private MainContract.View mView;
     private MovieRepository mMovieRepository;
@@ -50,6 +50,11 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
+    public void loadFavoriteMoviesIds() {
+        mMovieRepository.getAllFavoriteIds(this);
+    }
+
+    @Override
     public void setView(MainContract.View view) {
         mView = view;
     }
@@ -62,5 +67,15 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void onStop() {
 
+    }
+
+    @Override
+    public void onGetFavoriteIdsSuccess(List<Integer> ids) {
+        mView.showLoadFavoriteIdsSuccess(ids);
+    }
+
+    @Override
+    public void onGetFavoriteIdsFailed(Exception e) {
+        mView.showLoadFavoriteIdsFailed();
     }
 }

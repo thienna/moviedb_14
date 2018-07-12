@@ -100,12 +100,23 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         notifyDataSetChanged();
     }
 
+    public void updateIndex(Movie movie) {
+        if (movie == null){
+            return;
+        }
+        int indexChanged = mDataList.indexOf(movie);
+        if (indexChanged > -1){
+            notifyItemChanged(indexChanged, movie);
+        }
+    }
+
     static class ViewHolderMovie extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Movie mMovie;
         private ImageView mImageViewPoster;
         private TextView mTextViewMovieTitle;
         private TextView mTextViewMovieOverview;
         private TextView mTextViewMovieRating;
+        private ImageView mImageFloatFavorite;
         private OnRecyclerViewItemClickListener mListener;
 
         public ViewHolderMovie(View itemView, OnRecyclerViewItemClickListener listener) {
@@ -115,12 +126,18 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mTextViewMovieTitle = itemView.findViewById(R.id.text_search_item_title);
             mTextViewMovieOverview = itemView.findViewById(R.id.text_search_item_overview);
             mTextViewMovieRating = itemView.findViewById(R.id.text_search_item_rating_value);
+            mImageFloatFavorite = itemView.findViewById(R.id.image_float_favorite);
             itemView.setOnClickListener(this);
+            mImageFloatFavorite.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            mListener.onMovieItemClick(mMovie);
+            if (v.getId() == R.id.image_float_favorite) {
+                mListener.onClickFavoriteFloatButton(mMovie);
+            } else {
+                mListener.onMovieItemClick(mMovie);
+            }
         }
 
         void bindData(Object item) {
@@ -140,6 +157,11 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             mTextViewMovieTitle.setText(mMovie.getTitle());
             mTextViewMovieOverview.setText(mMovie.getOverview());
             mTextViewMovieRating.setText(String.valueOf(mMovie.getVoteAverage()));
+            if (mMovie.isFavorite()) {
+                mImageFloatFavorite.setImageResource(R.drawable.ic_favorite_main);
+            } else {
+                mImageFloatFavorite.setImageResource(R.drawable.ic_favorite_white_40dp);
+            }
         }
     }
 
@@ -186,5 +208,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         void onPersonItemClick(Person person);
 
         void onMovieItemClick(Movie movie);
+
+        void onClickFavoriteFloatButton(Movie movie);
     }
 }
